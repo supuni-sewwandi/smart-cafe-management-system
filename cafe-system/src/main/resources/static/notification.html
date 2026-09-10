@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — Bean &amp; Brew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --shadow:0 20px 50px -20px rgba(36,18,9,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Manrope', sans-serif; background:var(--cream); color:var(--ink); line-height:1.5; }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:700; }
+  .wrap{ max-width:720px; margin:0 auto; padding:0 28px; }
+
+  header{ background:rgba(246,236,223,.95); border-bottom:1px solid rgba(74,40,24,.1); padding:18px 0; }
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{ width:40px; height:40px; border-radius:50%; background:var(--red-600); display:flex; align-items:center; justify-content:center; color:var(--cream); font-family:'Fraunces',serif; font-weight:700; font-size:16px; }
+  .logo-text{ font-family:'Fraunces', serif; font-weight:700; font-size:19px; color:var(--brown-950); }
+  .back-link{ font-size:13.5px; font-weight:700; color:var(--brown-800); display:flex; align-items:center; gap:6px; }
+  .back-link svg{ width:15px; height:15px; }
+
+  main{ padding:40px 0 90px; }
+  .page-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:26px; flex-wrap:wrap; gap:10px; }
+  .page-head h1{ font-size:26px; color:var(--brown-950); }
+  .mark-all{ font-size:12.5px; font-weight:700; color:var(--red-600); background:none; border:none; cursor:pointer; }
+
+  .notif-card{ background:#fff; border-radius:14px; padding:18px 20px; margin-bottom:12px; box-shadow:0 8px 22px -18px rgba(36,18,9,.3); display:flex; gap:14px; align-items:flex-start; position:relative; }
+  .notif-card.unread{ border-left:4px solid var(--red-600); }
+  .notif-icon{ width:38px; height:38px; border-radius:50%; background:rgba(168,51,36,.1); color:var(--red-600); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .notif-icon svg{ width:18px; height:18px; }
+  .notif-body p{ font-size:14px; color:var(--brown-950); font-weight:600; margin-bottom:4px; }
+  .notif-body span{ font-size:11.5px; color:var(--brown-800); opacity:.6; }
+  .unread-dot{ width:9px; height:9px; border-radius:50%; background:var(--red-600); position:absolute; top:18px; right:18px; }
+
+  .empty-state{ text-align:center; padding:60px 20px; background:#fff; border-radius:18px; }
+  .empty-state svg{ width:48px; height:48px; color:var(--brown-800); opacity:.35; margin-bottom:16px; }
+  .empty-state p{ color:var(--brown-800); opacity:.7; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="menu.html" class="logo">
+      <div class="logo-mark">B&amp;B</div>
+      <div class="logo-text">Bean &amp; Brew</div>
+    </a>
+    <a href="profile.html" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> Back to Profile</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Notifications</h1>
+      <button class="mark-all" id="markAllBtn">Mark all as read</button>
+    </div>
+    <div id="notifList"></div>
+  </div>
+</main>
+
+<script>
+  const user = localStorage.getItem('bnb-user');
+  if(!user){
+    sessionStorage.setItem('bnb-redirect', 'notifications.html');
+    window.location.href = 'login.html';
+  }
+
+  const NOTIF_KEY = 'bnb-notifications-' + user;
+  function getNotifications(){
+    try{ return JSON.parse(localStorage.getItem(NOTIF_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveNotifications(list){ localStorage.setItem(NOTIF_KEY, JSON.stringify(list)); }
+
+  function render(){
+    const list = getNotifications();
+    const el = document.getElementById('notifList');
+    if(!list.length){
+      el.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <p>You're all caught up — no notifications yet.</p>
+        </div>`;
+      return;
+    }
+    el.innerHTML = list.map(n => `
+      <div class="notif-card ${n.read ? '' : 'unread'}" data-id="${n.id}">
+        <div class="notif-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        </div>
+        <div class="notif-body">
+          <p>${n.text}</p>
+          <span>${n.date}</span>
+        </div>
+        ${n.read ? '' : '<span class="unread-dot"></span>'}
+      </div>`).join('');
+
+    el.querySelectorAll('.notif-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const all = getNotifications();
+        const target = all.find(n => String(n.id) === card.dataset.id);
+        if(target){ target.read = true; saveNotifications(all); render(); }
+      });
+    });
+  }
+  render();
+
+  document.getElementById('markAllBtn').addEventListener('click', () => {
+    const all = getNotifications().map(n => ({ ...n, read: true }));
+    saveNotifications(all);
+    render();
+  });
+</script>
+
+</body>
+</html>
