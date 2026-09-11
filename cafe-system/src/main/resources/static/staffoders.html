@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders — Bean &amp; Brew Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --green:#3E7A4C; --shadow:0 20px 50px -20px rgba(36,18,9,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Manrope', sans-serif; background:var(--cream-2); color:var(--ink); line-height:1.5; }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:700; }
+  button{ font-family:inherit; }
+
+  .layout{ display:grid; grid-template-columns:250px 1fr; min-height:100vh; }
+
+  .sidebar{ background:var(--brown-950); color:var(--cream-2); padding:26px 20px; display:flex; flex-direction:column; }
+  .sidebar .logo{ display:flex; align-items:center; gap:10px; padding:6px 8px 26px; border-bottom:1px solid rgba(246,236,223,.12); margin-bottom:22px; }
+  .logo-mark{ width:38px; height:38px; border-radius:50%; background:var(--gold); color:var(--brown-950); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:15px; flex-shrink:0; }
+  .logo-text{ font-family:'Fraunces',serif; font-weight:700; font-size:17px; color:var(--cream); line-height:1.15; }
+  .logo-text small{ display:block; font-family:'Manrope',sans-serif; font-weight:700; font-size:9.5px; letter-spacing:.18em; color:var(--gold); margin-top:3px; }
+  .nav-group{ margin-bottom:22px; }
+  .nav-group h4{ font-size:10.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--cream-2); opacity:.4; font-weight:700; padding:0 10px; margin-bottom:10px; }
+  .nav-item{ display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:10px; font-size:14px; font-weight:600; color:var(--cream-2); opacity:.8; cursor:pointer; transition:background .2s, opacity .2s; border:none; background:none; width:100%; text-align:left; }
+  .nav-item svg{ width:17px; height:17px; flex-shrink:0; }
+  .nav-item:hover{ background:rgba(246,236,223,.08); opacity:1; }
+  .nav-item.active{ background:var(--red-600); opacity:1; color:var(--cream); }
+  .sidebar-foot{ margin-top:auto; padding-top:18px; border-top:1px solid rgba(246,236,223,.12); }
+  .admin-chip{ display:flex; align-items:center; gap:10px; padding:8px 10px; margin-bottom:10px; }
+  .admin-avatar{ width:32px; height:32px; border-radius:50%; background:var(--gold); color:var(--brown-950); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0; }
+  .admin-chip div p{ font-size:12.5px; font-weight:700; color:var(--cream); }
+  .admin-chip div span{ font-size:10.5px; color:var(--gold); font-weight:700; letter-spacing:.04em; }
+  .logout-link{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; font-size:13.5px; font-weight:700; color:var(--cream-2); opacity:.75; cursor:pointer; border:none; background:none; width:100%; text-align:left; }
+  .logout-link:hover{ opacity:1; color:var(--gold); }
+  .logout-link svg{ width:16px; height:16px; }
+
+  main{ padding:34px 40px 60px; overflow-x:hidden; }
+  .topline{ margin-bottom:24px; }
+  .topline h1{ font-size:26px; color:var(--brown-950); margin-bottom:5px; }
+  .topline p{ font-size:13.5px; color:var(--brown-800); opacity:.75; }
+
+  .filter-row{ display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap; }
+  .filter-chip{ padding:9px 16px; border-radius:100px; border:1.5px solid rgba(74,40,24,.15); background:#fff; font-size:12.5px; font-weight:700; color:var(--brown-800); cursor:pointer; }
+  .filter-chip.active{ border-color:var(--red-600); background:var(--red-600); color:var(--cream); }
+
+  .order-card{ background:#fff; border-radius:16px; padding:22px 24px; margin-bottom:16px; box-shadow:0 10px 26px -20px rgba(36,18,9,.3); }
+  .order-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .order-top .info strong{ font-size:15px; color:var(--brown-950); display:block; }
+  .order-top .info span{ font-size:12.5px; color:var(--brown-800); opacity:.65; }
+  .pill{ font-size:11px; font-weight:800; padding:6px 13px; border-radius:100px; text-transform:capitalize; }
+  .pill.new{ background:rgba(168,51,36,.1); color:var(--red-600); }
+  .pill.prep{ background:rgba(199,154,92,.2); color:#9C7530; }
+  .pill.ready{ background:rgba(62,122,76,.12); color:var(--green); }
+  .pill.completed{ background:rgba(74,40,24,.1); color:var(--brown-800); }
+  .pill.cancelled{ background:rgba(168,51,36,.1); color:var(--red-700); }
+
+  .order-items{ font-size:13.5px; color:var(--brown-800); margin-bottom:14px; }
+  .order-items div{ display:flex; justify-content:space-between; padding:4px 0; }
+  .order-bottom{ display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(74,40,24,.1); padding-top:14px; flex-wrap:wrap; gap:12px; }
+  .order-total{ font-weight:800; color:var(--red-600); font-family:'Fraunces',serif; font-size:16px; }
+  .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:9px 16px; border-radius:100px; font-weight:700; font-size:12.5px; cursor:pointer; border:1.5px solid transparent; }
+  .btn-primary{ background:var(--red-600); color:var(--cream); }
+  .btn-outline{ background:transparent; border:1.5px solid var(--brown-800); color:var(--brown-900); }
+  .btn-green{ background:var(--green); color:var(--cream); }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .empty-note{ text-align:center; background:#fff; border-radius:18px; padding:50px 20px; color:var(--brown-800); opacity:.65; font-size:14px; }
+
+  @media(max-width:1100px){ .layout{ grid-template-columns:210px 1fr; } }
+  @media(max-width:720px){ .layout{ grid-template-columns:1fr; } .sidebar{ display:none; } main{ padding:24px 20px 50px; } }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">B&amp;B</div>
+      <div class="logo-text">Bean &amp; Brew<small>ADMIN PANEL</small></div>
+    </div>
+    <div class="nav-group">
+      <h4>Overview</h4>
+      <a class="nav-item" href="admin-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+    </div>
+    <div class="nav-group">
+      <h4>Operations</h4>
+      <a class="nav-item active" href="staff-orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h13a3 3 0 0 1 0 6h-1M4 8v8a4 4 0 0 0 4 4h5a4 4 0 0 0 4-4v-1M4 8l1-4h9l1 4"/></svg>
+        Orders
+      </a>
+      <a class="nav-item" href="menu.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        Menu Items
+      </a>
+      <a class="nav-item" href="inventory.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Inventory
+      </a>
+      <a class="nav-item" href="suppliers.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+        Suppliers
+      </a>
+      <a class="nav-item" href="staff.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="18" cy="8" r="2.6"/><path d="M15.5 14.2c2.6.4 4.5 2.7 4.5 5.6"/></svg>
+        Staff &amp; Team
+      </a>
+    </div>
+    <div class="nav-group">
+      <h4>System</h4>
+      <a class="nav-item" href="system-admin.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>
+        System Admin
+      </a>
+    </div>
+    <div class="nav-group">
+      <h4>Insights</h4>
+      <a class="nav-item" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M11 19V4M18 19v-6"/></svg>
+        Reports
+      </a>
+    </div>
+    <div class="sidebar-foot">
+      <div class="admin-chip">
+        <div class="admin-avatar" id="adminAvatar">A</div>
+        <div><p id="adminEmailLabel">admin</p><span>ADMINISTRATOR</span></div>
+      </div>
+      <button class="logout-link" id="adminLogoutBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Log Out
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topline">
+      <h1>Orders</h1>
+      <p>View active orders, update status, process payments and refunds.</p>
+    </div>
+
+    <div class="filter-row" id="filterRow"></div>
+    <div id="ordersList"></div>
+  </main>
+</div>
+
+<script>
+  const adminEmail = sessionStorage.getItem('bnb-admin');
+  if(!adminEmail){ window.location.href = 'admin-login.html'; }
+  document.getElementById('adminEmailLabel').textContent = adminEmail;
+  document.getElementById('adminAvatar').textContent = adminEmail.charAt(0).toUpperCase();
+  document.getElementById('adminLogoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('bnb-admin');
+    window.location.href = 'admin-login.html';
+  });
+
+  const STAGES = ['new','prep','ready','completed'];
+  const NEXT_STAGE = { new:'prep', prep:'ready', ready:'completed' };
+  const NEXT_LABEL = { new:'Start Preparing', prep:'Mark Ready', ready:'Mark Completed' };
+
+  let activeFilter = 'all';
+
+  // Orders live per-customer under 'bnb-orders-<email>'. Staff need a
+  // cross-customer view, so we scan all matching keys and keep track of
+  // which customer each order belongs to for saving updates back.
+  function collectAllOrders(){
+    const all = [];
+    for(let i = 0; i < localStorage.length; i++){
+      const key = localStorage.key(i);
+      if(key && key.startsWith('bnb-orders-')){
+        try{
+          const orders = JSON.parse(localStorage.getItem(key)) || [];
+          const customer = key.replace('bnb-orders-', '');
+          orders.forEach(o => all.push({ ...o, customer, _key: key }));
+        }catch(e){}
+      }
+    }
+    return all.sort((a,b) => (b.id > a.id ? 1 : -1));
+  }
+  function updateOrder(order, changes){
+    try{
+      const list = JSON.parse(localStorage.getItem(order._key)) || [];
+      const target = list.find(o => o.id === order.id);
+      Object.assign(target, changes);
+      localStorage.setItem(order._key, JSON.stringify(list));
+    }catch(e){}
+  }
+  function addCustomerNotification(customer, text){
+    const key = 'bnb-notifications-' + customer;
+    let list = [];
+    try{ list = JSON.parse(localStorage.getItem(key)) || []; }catch(e){ list = []; }
+    list.unshift({ id: Date.now(), text, date: new Date().toLocaleString(), read:false });
+    localStorage.setItem(key, JSON.stringify(list));
+  }
+
+  function renderFilters(all){
+    const counts = { all: all.length };
+    STAGES.concat('cancelled').forEach(s => counts[s] = all.filter(o => o.status === s).length);
+    const labels = { all:'All', new:'New', prep:'Preparing', ready:'Ready', completed:'Completed', cancelled:'Cancelled / Refunds' };
+    document.getElementById('filterRow').innerHTML = Object.keys(labels).map(key => `
+      <button class="filter-chip ${activeFilter === key ? 'active' : ''}" data-filter="${key}">
+        ${labels[key]} (${counts[key] || 0})
+      </button>`).join('');
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => { activeFilter = chip.dataset.filter; render(); });
+    });
+  }
+
+  function render(){
+    const all = collectAllOrders();
+    renderFilters(all);
+    const list = activeFilter === 'all' ? all : all.filter(o => o.status === activeFilter);
+    const container = document.getElementById('ordersList');
+
+    if(!list.length){
+      container.innerHTML = `<div class="empty-note">No orders in this view.</div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(o => `
+      <div class="order-card">
+        <div class="order-top">
+          <div class="info">
+            <strong>Order #${o.id}</strong>
+            <span>${o.customer} · ${o.date} · ${o.type === 'delivery' ? 'Delivery' : 'Pickup'}</span>
+          </div>
+          <span class="pill ${o.status}">${o.status}</span>
+        </div>
+        <div class="order-items">
+          ${o.items.map(i => `<div><span>${i.name} × ${i.qty}</span><span>Rs ${(i.price*i.qty).toLocaleString()}</span></div>`).join('')}
+        </div>
+        <div class="order-bottom">
+          <span class="order-total">Rs ${o.total.toLocaleString()} · ${o.method === 'card' ? 'Card' : 'Cash'}</span>
+          <div class="actions">
+            ${o.status === 'cancelled' && o.refund === 'requested'
+              ? `<button class="btn btn-green" data-refund="${o.id}" data-key="${o._key}">Process Refund</button>`
+              : ''}
+            ${o.status === 'cancelled' && o.refund === 'processed'
+              ? `<span class="btn btn-outline" style="pointer-events:none;">Refund Processed ✓</span>` : ''}
+            ${NEXT_STAGE[o.status]
+              ? `<button class="btn btn-primary" data-advance="${o.id}" data-key="${o._key}">${NEXT_LABEL[o.status]}</button>`
+              : ''}
+            ${o.status === 'completed' ? `<a class="btn btn-outline" href="invoice.html?order=${o.id}">Generate Invoice</a>` : ''}
+          </div>
+        </div>
+      </div>`).join('');
+
+    container.querySelectorAll('[data-advance]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const order = all.find(o => o.id === btn.dataset.advance && o._key === btn.dataset.key);
+        const next = NEXT_STAGE[order.status];
+        updateOrder(order, { status: next });
+        addCustomerNotification(order.customer, `Your order #${order.id} is now ${next === 'prep' ? 'being prepared' : next}.`);
+        render();
+      });
+    });
+    container.querySelectorAll('[data-refund]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const order = all.find(o => o.id === btn.dataset.refund && o._key === btn.dataset.key);
+        updateOrder(order, { refund: 'processed' });
+        addCustomerNotification(order.customer, `Your refund for order #${order.id} has been processed.`);
+        render();
+      });
+    });
+  }
+
+  render();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Bean &amp; Brew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --shadow: 0 20px 50px -20px rgba(36,18,9,0.45);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Manrope', sans-serif; background:var(--brown-950); color:var(--ink);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(168,51,36,.25), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(199,154,92,.18), transparent 45%);
+  }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2{ font-family:'Fraunces', serif; font-weight:700; }
+
+  .auth-card{
+    background:var(--cream); border-radius:24px; width:100%; max-width:420px;
+    padding:44px 38px 38px; box-shadow:var(--shadow); position:relative;
+  }
+  .logo{ display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:26px; }
+  .logo-mark{
+    width:44px; height:44px; border-radius:50%; background:var(--red-600);
+    display:flex; align-items:center; justify-content:center; color:var(--cream);
+    font-family:'Fraunces',serif; font-weight:700; font-size:18px;
+  }
+  .logo-text{ font-family:'Fraunces', serif; font-weight:700; font-size:21px; color:var(--brown-950); line-height:1; }
+  .logo-text small{ display:block; font-family:'Manrope',sans-serif; font-weight:600; font-size:10px; letter-spacing:.2em; color:var(--red-600); margin-top:3px; }
+
+  .auth-card h1{ font-size:26px; color:var(--brown-950); text-align:center; margin-bottom:6px; }
+  .auth-card p.sub{ text-align:center; color:var(--brown-800); font-size:14px; opacity:.8; margin-bottom:28px; }
+
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--brown-900); margin-bottom:7px; letter-spacing:.02em; }
+  .field input{
+    width:100%; padding:13px 15px; border-radius:12px; border:1.5px solid rgba(74,40,24,.2);
+    background:#fff; font-size:14.5px; font-family:'Manrope',sans-serif; color:var(--ink); outline:none;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .field input:focus{ border-color:var(--red-600); box-shadow:0 0 0 3px rgba(168,51,36,.12); }
+
+  .row-between{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; font-size:13px; }
+  .row-between label{ display:flex; align-items:center; gap:7px; color:var(--brown-800); cursor:pointer; }
+  .row-between a{ color:var(--red-600); font-weight:700; }
+
+  .btn-submit{
+    width:100%; padding:14px; border:none; border-radius:100px; background:var(--red-600); color:var(--cream);
+    font-weight:700; font-size:15px; cursor:pointer; box-shadow:0 12px 24px -10px rgba(168,51,36,.6);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .btn-submit:hover{ transform:translateY(-2px); box-shadow:0 16px 28px -10px rgba(168,51,36,.7); }
+
+  .divider{ display:flex; align-items:center; gap:12px; margin:26px 0; color:var(--brown-800); opacity:.55; font-size:12px; font-weight:700; }
+  .divider::before, .divider::after{ content:""; flex:1; height:1px; background:rgba(74,40,24,.2); }
+
+  .signup-line{ text-align:center; font-size:14px; color:var(--brown-800); }
+  .signup-line a{ color:var(--red-600); font-weight:700; }
+
+  .error-msg{ display:none; background:#FBE3DE; color:var(--red-700); font-size:13px; font-weight:600; padding:10px 14px; border-radius:10px; margin-bottom:18px; }
+  .error-msg.show{ display:block; }
+
+  .admin-link{
+  text-align:center;
+  margin-top:16px;
+  font-size:13px;
+  color:var(--brown-800);
+}
+
+.admin-link a{
+  color:var(--red-600);
+  font-weight:700;
+}
+</style>
+</head>
+<body>
+
+<div class="auth-card">
+  <div class="logo">
+    <div class="logo-mark">B&amp;B</div>
+    <div class="logo-text">Bean &amp; Brew<small>ROASTERY &amp; CAFÉ</small></div>
+  </div>
+
+  <h1>Welcome back</h1>
+  <p class="sub">Log in to order your favourite brew</p>
+
+  <div class="error-msg" id="errorMsg">Please enter both email and password.</div>
+
+  <form id="loginForm">
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@email.com" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••" required>
+    </div>
+    <div class="row-between">
+      <label><input type="checkbox"> Remember me</label>
+      <a href="#">Forgot password?</a>
+    </div>
+    <button type="submit" class="btn-submit">Log In</button>
+  </form>
+
+  <div class="divider">OR</div>
+
+  <p class="signup-line">Don't have an account? <a href="signup.html">Sign up</a></p>
+  <p class="admin-link">
+  Staff/Admin? <a href="adminlogin.html">Admin Login</a>
+</p>
+</div>
+
+<script>
+  const form = document.getElementById('loginForm');
+  const errorMsg = document.getElementById('errorMsg');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if(!email || !password){
+      errorMsg.classList.add('show');
+      return;
+    }
+    errorMsg.classList.remove('show');
+
+    // Demo login: store a simple session flag and go to the menu.
+    // Replace this with a real authentication call when you connect a backend.
+    localStorage.setItem('bnb-user', email);
+    // If the person was sent here from the menu (trying to add to cart),
+    // send them back there. Otherwise go to their profile.
+    const redirectTo = sessionStorage.getItem('bnb-redirect') || 'profile.html';
+    sessionStorage.removeItem('bnb-redirect');
+    window.location.href = redirectTo;
+  });
+</script>
+
+</body>
+</html>

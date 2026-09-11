@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice — Bean &amp; Brew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --shadow:0 20px 50px -20px rgba(36,18,9,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Manrope', sans-serif; background:var(--cream-2); color:var(--ink); line-height:1.5; }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:700; }
+  .wrap{ max-width:720px; margin:0 auto; padding:0 28px; }
+
+  header{ background:rgba(246,236,223,.95); border-bottom:1px solid rgba(74,40,24,.1); padding:18px 0; }
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{ width:40px; height:40px; border-radius:50%; background:var(--red-600); display:flex; align-items:center; justify-content:center; color:var(--cream); font-family:'Fraunces',serif; font-weight:700; font-size:16px; }
+  .logo-text{ font-family:'Fraunces', serif; font-weight:700; font-size:19px; color:var(--brown-950); }
+  .back-link{ font-size:13.5px; font-weight:700; color:var(--brown-800); display:flex; align-items:center; gap:6px; }
+  .back-link svg{ width:15px; height:15px; }
+
+  main{ padding:40px 0 90px; }
+
+  .invoice-card{ background:#fff; border-radius:20px; padding:40px; box-shadow:0 10px 30px -20px rgba(36,18,9,.3); }
+  .inv-head{ display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:26px; border-bottom:2px dashed rgba(74,40,24,.15); margin-bottom:26px; flex-wrap:wrap; gap:16px; }
+  .inv-head .brand{ display:flex; align-items:center; gap:10px; }
+  .inv-head .brand-info p{ font-size:12px; color:var(--brown-800); opacity:.65; margin-top:3px; }
+  .inv-head .right{ text-align:right; }
+  .inv-head .right h2{ font-size:20px; color:var(--brown-950); }
+  .inv-head .right p{ font-size:12.5px; color:var(--brown-800); opacity:.7; margin-top:4px; }
+
+  .inv-meta{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+  .inv-meta div span{ display:block; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--brown-800); opacity:.55; margin-bottom:5px; }
+  .inv-meta div strong{ font-size:14px; color:var(--brown-950); }
+
+  table{ width:100%; border-collapse:collapse; margin-bottom:22px; }
+  thead th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--brown-800); opacity:.55; font-weight:800; padding-bottom:12px; border-bottom:1.5px solid rgba(74,40,24,.15); }
+  thead th:last-child, tbody td:last-child{ text-align:right; }
+  tbody td{ padding:12px 0; border-bottom:1px solid rgba(74,40,24,.08); font-size:14px; color:var(--brown-950); }
+
+  .totals{ margin-left:auto; width:260px; }
+  .totals-row{ display:flex; justify-content:space-between; font-size:13.5px; color:var(--brown-800); padding:6px 0; }
+  .totals-row.grand{ font-weight:800; color:var(--brown-950); font-size:17px; border-top:2px solid rgba(74,40,24,.15); margin-top:8px; padding-top:14px; }
+  .totals-row.grand span:last-child{ color:var(--red-600); font-family:'Fraunces',serif; }
+
+  .paid-stamp{ display:inline-block; margin-top:26px; padding:7px 18px; border:2px solid var(--red-600); color:var(--red-600); font-weight:800; font-size:12px; letter-spacing:.1em; text-transform:uppercase; border-radius:8px; transform:rotate(-3deg); }
+
+  .btn-row{ display:flex; gap:14px; margin-top:30px; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:13px 24px; border-radius:100px; font-weight:700; font-size:13.5px; cursor:pointer; border:1.5px solid transparent; }
+  .btn-primary{ background:var(--red-600); color:var(--cream); }
+  .btn-outline{ background:transparent; border-color:var(--brown-800); color:var(--brown-900); }
+
+  .empty-state{ text-align:center; padding:60px 20px; background:#fff; border-radius:18px; }
+  .empty-state p{ color:var(--brown-800); opacity:.7; margin-bottom:20px; }
+  .empty-state a{ display:inline-block; padding:12px 26px; background:var(--red-600); color:var(--cream); border-radius:100px; font-weight:700; font-size:14px; }
+
+  @media print{
+    header, .btn-row{ display:none; }
+    body{ background:#fff; }
+    main{ padding:0; }
+    .invoice-card{ box-shadow:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="menu.html" class="logo">
+      <div class="logo-mark">B&amp;B</div>
+      <div class="logo-text">Bean &amp; Brew</div>
+    </a>
+    <a href="order-tracking.html" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> Back to Orders</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap" id="invoiceWrap"></div>
+</main>
+
+<script>
+  const user = localStorage.getItem('bnb-user');
+  if(!user){
+    sessionStorage.setItem('bnb-redirect', 'order-tracking.html');
+    window.location.href = 'login.html';
+  }
+
+  function getOrders(){
+    try{ return JSON.parse(localStorage.getItem('bnb-orders-' + user)) || []; }
+    catch(e){ return []; }
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get('order');
+  const orders = getOrders();
+  const order = orders.find(o => o.id === orderId) || orders[0];
+
+  const wrap = document.getElementById('invoiceWrap');
+
+  if(!order){
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <h3 style="margin-bottom:10px;">No invoice found</h3>
+        <p>Place an order first to generate an invoice.</p>
+        <a href="menu.html">Browse the Menu</a>
+      </div>`;
+  } else {
+    const DELIVERY_FEE = order.type === 'delivery' ? 200 : 0;
+    const subtotal = order.total - DELIVERY_FEE;
+    const dueLabel = 'DUE ON ' + (order.type === 'delivery' ? 'DELIVERY' : 'PICKUP');
+
+    wrap.innerHTML = `
+      <div class="invoice-card">
+        <div class="inv-head">
+          <div class="brand">
+            <div class="logo-mark">B&amp;B</div>
+            <div class="brand-info">
+              <div class="logo-text">Bean &amp; Brew</div>
+              <p>123 Galle Road, Colombo<br>hello@beanandbrew.cafe</p>
+            </div>
+          </div>
+          <div class="right">
+            <h2>Invoice</h2>
+            <p>#${order.id}</p>
+            <p>${order.date}</p>
+          </div>
+        </div>
+
+        <div class="inv-meta">
+          <div><span>Billed To</span><strong>${user}</strong></div>
+          <div><span>Order Type</span><strong style="text-transform:capitalize;">${order.type}</strong></div>
+          <div><span>Payment Method</span><strong>${order.method === 'card' ? 'Card' : 'Cash'}</strong></div>
+        </div>
+
+        <table>
+          <thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead>
+          <tbody>
+            ${order.items.map(i => `
+              <tr>
+                <td>${i.name}</td>
+                <td>${i.qty}</td>
+                <td>Rs ${(i.price * i.qty).toLocaleString()}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div class="totals-row"><span>Subtotal</span><span>Rs ${subtotal.toLocaleString()}</span></div>
+          ${DELIVERY_FEE ? `<div class="totals-row"><span>Delivery Fee</span><span>Rs ${DELIVERY_FEE}</span></div>` : ''}
+          <div class="totals-row grand"><span>Total</span><span>Rs ${order.total.toLocaleString()}</span></div>
+        </div>
+
+        ${order.status === 'cancelled'
+          ? `<div class="paid-stamp" style="border-color:var(--brown-800); color:var(--brown-800);">CANCELLED</div>`
+          : `<div class="paid-stamp">${order.method === 'card' ? 'PAID' : dueLabel}</div>`}
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+          <a href="order-tracking.html?order=${order.id}" class="btn btn-outline">Back to Order</a>
+        </div>
+      </div>`;
+  }
+</script>
+
+</body>
+</html>
