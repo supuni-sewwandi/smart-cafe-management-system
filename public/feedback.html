@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback — Bean &amp; Brew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --green:#3E7A4C; --shadow:0 20px 50px -20px rgba(36,18,9,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Manrope', sans-serif; background:var(--cream); color:var(--ink); line-height:1.5; }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:700; }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 28px; }
+
+  header{ background:rgba(246,236,223,.95); border-bottom:1px solid rgba(74,40,24,.1); padding:18px 0; }
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{ width:40px; height:40px; border-radius:50%; background:var(--red-600); display:flex; align-items:center; justify-content:center; color:var(--cream); font-family:'Fraunces',serif; font-weight:700; font-size:16px; }
+  .logo-text{ font-family:'Fraunces', serif; font-weight:700; font-size:19px; color:var(--brown-950); }
+  .back-link{ font-size:13.5px; font-weight:700; color:var(--brown-800); display:flex; align-items:center; gap:6px; }
+  .back-link svg{ width:15px; height:15px; }
+
+  main{ padding:40px 0 90px; }
+  .page-head{ margin-bottom:30px; }
+  .page-head span{ font-size:12.5px; font-weight:800; letter-spacing:.1em; color:var(--red-600); text-transform:uppercase; }
+  .page-head h1{ font-size:28px; color:var(--brown-950); margin-top:8px; }
+
+  .panel{ background:#fff; border-radius:18px; padding:28px; box-shadow:0 10px 26px -20px rgba(36,18,9,.3); margin-bottom:22px; }
+  .panel h2{ font-size:16.5px; color:var(--brown-950); margin-bottom:18px; }
+
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--brown-900); margin-bottom:7px; }
+  .field select, .field textarea{ width:100%; padding:12px 14px; border-radius:10px; border:1.5px solid rgba(74,40,24,.18); font-size:14px; font-family:inherit; outline:none; }
+  .field select:focus, .field textarea:focus{ border-color:var(--red-600); }
+  .field textarea{ resize:vertical; min-height:100px; }
+
+  .star-row{ display:flex; gap:8px; margin-bottom:6px; }
+  .star{ width:38px; height:38px; cursor:pointer; color:rgba(74,40,24,.2); transition:color .15s, transform .15s; }
+  .star.active{ color:var(--gold); }
+  .star:hover{ transform:scale(1.1); }
+  .star-caption{ font-size:12.5px; color:var(--brown-800); opacity:.65; margin-bottom:16px; }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:14px 26px; border-radius:100px; font-weight:700; font-size:14.5px; cursor:pointer; border:1.5px solid transparent; transition:transform .2s; }
+  .btn-primary{ background:var(--red-600); color:var(--cream); box-shadow:0 12px 24px -10px rgba(168,51,36,.55); width:100%; }
+  .btn:hover{ transform:translateY(-2px); }
+
+  .error-msg{ display:none; background:#FBE3DE; color:var(--red-700); font-size:13px; font-weight:600; padding:10px 14px; border-radius:10px; margin-bottom:16px; }
+  .error-msg.show{ display:block; }
+
+  .thankyou{ text-align:center; padding:30px 10px; }
+  .thankyou svg{ width:52px; height:52px; color:var(--green); margin-bottom:14px; }
+  .thankyou h3{ font-size:19px; color:var(--brown-950); margin-bottom:6px; }
+  .thankyou p{ font-size:13.5px; color:var(--brown-800); opacity:.7; }
+
+  .fb-card{ background:#fff; border-radius:14px; padding:16px 20px; margin-bottom:12px; box-shadow:0 8px 22px -18px rgba(36,18,9,.3); }
+  .fb-card .top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .fb-card .stars{ color:var(--gold); font-size:14px; letter-spacing:2px; }
+  .fb-card .date{ font-size:11.5px; color:var(--brown-800); opacity:.55; }
+  .fb-card p{ font-size:13.5px; color:var(--brown-900); }
+  .empty-note{ font-size:13.5px; color:var(--brown-800); opacity:.6; text-align:center; padding:20px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="menu.html" class="logo">
+      <div class="logo-mark">B&amp;B</div>
+      <div class="logo-text">Bean &amp; Brew</div>
+    </a>
+    <a href="profile.html" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> Back to Profile</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <span>We'd love to hear from you</span>
+      <h1>Share Your Feedback</h1>
+    </div>
+
+    <div class="panel" id="formPanel">
+      <h2>Rate Your Experience</h2>
+      <div class="error-msg" id="fbError"></div>
+
+      <div class="field">
+        <label>Which order is this about? (optional)</label>
+        <select id="fbOrder"><option value="">General feedback</option></select>
+      </div>
+
+      <div class="field">
+        <label>Your Rating</label>
+        <div class="star-row" id="starRow"></div>
+        <div class="star-caption" id="starCaption">Tap a star to rate</div>
+      </div>
+
+      <div class="field">
+        <label for="fbComment">Comments</label>
+        <textarea id="fbComment" placeholder="Tell us what you loved, or what we can improve..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" id="submitFeedbackBtn">Submit Feedback</button>
+    </div>
+
+    <div class="panel">
+      <h2>Your Previous Feedback</h2>
+      <div id="fbList"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const user = localStorage.getItem('bnb-user');
+  if(!user){
+    sessionStorage.setItem('bnb-redirect', 'feedback.html');
+    window.location.href = 'login.html';
+  }
+
+  const FB_KEY = 'bnb-feedback-' + user;
+  function getFeedback(){
+    try{ return JSON.parse(localStorage.getItem(FB_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveFeedback(list){ localStorage.setItem(FB_KEY, JSON.stringify(list)); }
+  function getOrders(){
+    try{ return JSON.parse(localStorage.getItem('bnb-orders-' + user)) || []; }
+    catch(e){ return []; }
+  }
+
+  // Preselect an order if the page was reached via order-tracking.html
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectOrder = urlParams.get('order');
+
+  const orderSelect = document.getElementById('fbOrder');
+  getOrders().forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.id;
+    opt.textContent = `Order #${o.id} (${o.date})`;
+    if(o.id === preselectOrder) opt.selected = true;
+    orderSelect.appendChild(opt);
+  });
+
+  const CAPTIONS = ['Tap a star to rate','Poor','Fair','Good','Very Good','Excellent'];
+  let rating = 0;
+  const starRow = document.getElementById('starRow');
+  for(let i = 1; i <= 5; i++){
+    const star = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    star.setAttribute('viewBox','0 0 24 24');
+    star.setAttribute('fill','currentColor');
+    star.classList.add('star');
+    star.dataset.value = i;
+    star.innerHTML = '<path d="M12 2l2.8 6.2 6.8.6-5.1 4.5 1.5 6.7L12 16.6 5.9 20l1.6-6.7L2.4 8.8l6.8-.6L12 2z"/>';
+    star.addEventListener('click', () => {
+      rating = i;
+      updateStars();
+    });
+    starRow.appendChild(star);
+  }
+  function updateStars(){
+    starRow.querySelectorAll('.star').forEach(s => {
+      s.classList.toggle('active', Number(s.dataset.value) <= rating);
+    });
+    document.getElementById('starCaption').textContent = CAPTIONS[rating];
+  }
+
+  document.getElementById('submitFeedbackBtn').addEventListener('click', () => {
+    const errorEl = document.getElementById('fbError');
+    const comment = document.getElementById('fbComment').value.trim();
+
+    if(rating === 0){
+      errorEl.textContent = 'Please select a star rating before submitting.';
+      errorEl.classList.add('show');
+      return;
+    }
+    errorEl.classList.remove('show');
+
+    const entry = {
+      id: Date.now(),
+      orderId: orderSelect.value || null,
+      rating,
+      comment,
+      date: new Date().toLocaleString()
+    };
+    const list = getFeedback();
+    list.unshift(entry);
+    saveFeedback(list);
+
+    document.getElementById('formPanel').innerHTML = `
+      <div class="thankyou">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9"/></svg>
+        <h3>Thank you for your feedback!</h3>
+        <p>It helps us make Bean &amp; Brew better every day.</p>
+      </div>`;
+    renderFeedbackList();
+  });
+
+  function renderFeedbackList(){
+    const list = getFeedback();
+    const el = document.getElementById('fbList');
+    if(!list.length){
+      el.innerHTML = '<p class="empty-note">You haven\'t left any feedback yet.</p>';
+      return;
+    }
+    el.innerHTML = list.map(f => `
+      <div class="fb-card">
+        <div class="top">
+          <span class="stars">${'★'.repeat(f.rating)}${'☆'.repeat(5 - f.rating)}</span>
+          <span class="date">${f.date}${f.orderId ? ' · Order #' + f.orderId : ''}</span>
+        </div>
+        ${f.comment ? `<p>${f.comment}</p>` : ''}
+      </div>`).join('');
+  }
+
+  updateStars();
+  renderFeedbackList();
+</script>
+
+</body>
+</html>

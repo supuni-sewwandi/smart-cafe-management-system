@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Bean &amp; Brew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --green:#3E7A4C; --shadow:0 20px 50px -20px rgba(36,18,9,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Manrope', sans-serif; background:var(--cream); color:var(--ink); line-height:1.5; }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:700; }
+  .wrap{ max-width:980px; margin:0 auto; padding:0 28px; }
+
+  header{ background:rgba(246,236,223,.95); border-bottom:1px solid rgba(74,40,24,.1); padding:18px 0; }
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{ width:40px; height:40px; border-radius:50%; background:var(--red-600); display:flex; align-items:center; justify-content:center; color:var(--cream); font-family:'Fraunces',serif; font-weight:700; font-size:16px; }
+  .logo-text{ font-family:'Fraunces', serif; font-weight:700; font-size:19px; color:var(--brown-950); }
+  .back-link{ font-size:13.5px; font-weight:700; color:var(--brown-800); display:flex; align-items:center; gap:6px; }
+  .back-link svg{ width:15px; height:15px; }
+
+  main{ padding:40px 0 90px; }
+  .page-head{ margin-bottom:30px; }
+  .page-head span{ font-size:12.5px; font-weight:800; letter-spacing:.1em; color:var(--red-600); text-transform:uppercase; }
+  .page-head h1{ font-size:28px; color:var(--brown-950); margin-top:8px; }
+
+  .steps{ display:flex; gap:10px; margin-bottom:34px; }
+  .step{ flex:1; height:4px; border-radius:100px; background:rgba(74,40,24,.12); }
+  .step.done{ background:var(--red-600); }
+
+  .checkout-grid{ display:grid; grid-template-columns:1.4fr 1fr; gap:28px; align-items:start; }
+
+  .panel{ background:#fff; border-radius:18px; padding:26px; box-shadow:0 10px 26px -20px rgba(36,18,9,.3); margin-bottom:22px; }
+  .panel h2{ font-size:16.5px; color:var(--brown-950); margin-bottom:18px; }
+
+  .cart-line{ display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(74,40,24,.08); }
+  .cart-line:last-child{ border-bottom:none; }
+  .cart-line .name{ font-weight:700; font-size:14px; color:var(--brown-950); }
+  .cart-line .qty{ font-size:12.5px; color:var(--brown-800); opacity:.7; }
+  .cart-line .price{ font-family:'Fraunces',serif; font-weight:700; color:var(--red-600); font-size:14.5px; }
+
+  .toggle-row{ display:flex; gap:12px; margin-bottom:18px; }
+  .toggle-btn{ flex:1; padding:13px; border-radius:12px; border:1.5px solid rgba(74,40,24,.18); background:#fff; font-weight:700; font-size:13.5px; color:var(--brown-800); cursor:pointer; text-align:center; transition:border-color .2s, background .2s, color .2s; }
+  .toggle-btn.active{ border-color:var(--red-600); background:rgba(168,51,36,.06); color:var(--red-700); }
+
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--brown-900); margin-bottom:7px; }
+  .field input, .field textarea{ width:100%; padding:12px 14px; border-radius:10px; border:1.5px solid rgba(74,40,24,.18); font-size:14px; font-family:inherit; outline:none; }
+  .field input:focus, .field textarea:focus{ border-color:var(--red-600); }
+  .field textarea{ resize:vertical; min-height:70px; }
+  #addressField{ display:none; }
+  #addressField.show{ display:block; }
+
+  .pay-option{ display:flex; align-items:center; gap:12px; padding:14px; border:1.5px solid rgba(74,40,24,.18); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:border-color .2s, background .2s; }
+  .pay-option.active{ border-color:var(--red-600); background:rgba(168,51,36,.06); }
+  .pay-option input{ accent-color:var(--red-600); }
+  .pay-option div strong{ display:block; font-size:14px; color:var(--brown-950); }
+  .pay-option div span{ font-size:12px; color:var(--brown-800); opacity:.7; }
+  .card-fields{ display:none; grid-template-columns:1fr 1fr; gap:12px; margin-top:6px; }
+  .card-fields.show{ display:grid; }
+  .card-fields .full{ grid-column:1/-1; }
+
+  .summary-row{ display:flex; justify-content:space-between; font-size:13.5px; color:var(--brown-800); padding:6px 0; }
+  .summary-row.total{ font-weight:800; color:var(--brown-950); font-size:16px; border-top:1px solid rgba(74,40,24,.12); margin-top:8px; padding-top:14px; }
+  .summary-row.total span:last-child{ color:var(--red-600); font-family:'Fraunces',serif; }
+
+  .btn-place{ width:100%; padding:15px; border:none; border-radius:100px; background:var(--red-600); color:var(--cream); font-weight:700; font-size:15px; cursor:pointer; box-shadow:0 12px 24px -10px rgba(168,51,36,.55); transition:transform .2s, box-shadow .2s; margin-top:6px; }
+  .btn-place:hover{ transform:translateY(-2px); box-shadow:0 16px 28px -10px rgba(168,51,36,.65); }
+  .btn-place:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+
+  .empty-cart{ text-align:center; padding:60px 20px; background:#fff; border-radius:18px; }
+  .empty-cart p{ color:var(--brown-800); opacity:.75; margin-bottom:20px; }
+  .empty-cart a{ display:inline-block; padding:12px 26px; background:var(--red-600); color:var(--cream); border-radius:100px; font-weight:700; font-size:14px; }
+
+  .error-msg{ display:none; background:#FBE3DE; color:var(--red-700); font-size:13px; font-weight:600; padding:10px 14px; border-radius:10px; margin-bottom:16px; }
+  .error-msg.show{ display:block; }
+
+  @media(max-width:820px){ .checkout-grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="menu.html" class="logo">
+      <div class="logo-mark">B&amp;B</div>
+      <div class="logo-text">Bean &amp; Brew</div>
+    </a>
+    <a href="menu.html" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> Back to Menu</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <span>Step 2 of 3</span>
+      <h1>Checkout</h1>
+    </div>
+    <div class="steps">
+      <div class="step done"></div>
+      <div class="step done"></div>
+      <div class="step"></div>
+    </div>
+
+    <div id="checkoutContent"></div>
+  </div>
+</main>
+
+<script>
+  // This page requires a logged-in customer. If not logged in, remember
+  // to come back here after login (same redirect pattern as menu.html).
+  const user = localStorage.getItem('bnb-user');
+  if(!user){
+    sessionStorage.setItem('bnb-redirect', 'checkout.html');
+    window.location.href = 'login.html';
+  }
+
+  function getCart(){
+    try{ return JSON.parse(localStorage.getItem('bnb-cart')) || []; }
+    catch(e){ return []; }
+  }
+  function getOrders(){
+    const key = 'bnb-orders-' + user;
+    try{ return JSON.parse(localStorage.getItem(key)) || []; }
+    catch(e){ return []; }
+  }
+  function saveOrders(orders){
+    localStorage.setItem('bnb-orders-' + user, JSON.stringify(orders));
+  }
+  function addNotification(text){
+    const key = 'bnb-notifications-' + user;
+    let list = [];
+    try{ list = JSON.parse(localStorage.getItem(key)) || []; }catch(e){ list = []; }
+    list.unshift({ id: Date.now(), text, date: new Date().toLocaleString(), read:false });
+    localStorage.setItem(key, JSON.stringify(list));
+  }
+
+  const cart = getCart();
+  const content = document.getElementById('checkoutContent');
+
+  if(cart.length === 0){
+    content.innerHTML = `
+      <div class="empty-cart">
+        <h3 style="margin-bottom:10px;">Your cart is empty</h3>
+        <p>Add a few items from the menu before checking out.</p>
+        <a href="menu.html">Browse the Menu</a>
+      </div>`;
+  } else {
+    const subtotal = cart.reduce((s,i)=> s + i.price*i.qty, 0);
+    const deliveryFee = 0; // set on toggle
+    content.innerHTML = `
+      <div class="checkout-grid">
+        <div>
+          <div class="panel">
+            <h2>Order Summary</h2>
+            ${cart.map(i => `
+              <div class="cart-line">
+                <div>
+                  <div class="name">${i.name}</div>
+                  <div class="qty">Qty ${i.qty}</div>
+                </div>
+                <div class="price">Rs ${(i.price*i.qty).toLocaleString()}</div>
+              </div>`).join('')}
+          </div>
+
+          <div class="panel">
+            <h2>Pickup or Delivery</h2>
+            <div class="toggle-row">
+              <button type="button" class="toggle-btn active" id="pickupBtn">Pickup at Café</button>
+              <button type="button" class="toggle-btn" id="deliveryBtn">Delivery</button>
+            </div>
+            <div class="field" id="addressField">
+              <label for="address">Delivery Address</label>
+              <textarea id="address" placeholder="House no, street, city"></textarea>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Payment Method</h2>
+            <label class="pay-option active" id="cashOption">
+              <input type="radio" name="pay" value="cash" checked>
+              <div><strong>Cash on Delivery / Pickup</strong><span>Pay when you receive your order</span></div>
+            </label>
+            <label class="pay-option" id="cardOption">
+              <input type="radio" name="pay" value="card">
+              <div><strong>Card Payment</strong><span>Pay online now with a debit or credit card</span></div>
+            </label>
+            <div class="card-fields" id="cardFields">
+              <div class="field full"><label>Card Number</label><input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19"></div>
+              <div class="field"><label>Expiry</label><input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5"></div>
+              <div class="field"><label>CVC</label><input type="text" id="cardCvc" placeholder="123" maxlength="3"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <h2>Total</h2>
+            <div class="error-msg" id="checkoutError"></div>
+            <div class="summary-row"><span>Subtotal</span><span>Rs ${subtotal.toLocaleString()}</span></div>
+            <div class="summary-row" id="deliveryRow" style="display:none;"><span>Delivery Fee</span><span>Rs 200</span></div>
+            <div class="summary-row total"><span>Total</span><span id="grandTotal">Rs ${subtotal.toLocaleString()}</span></div>
+            <button class="btn-place" id="placeOrderBtn">Confirm &amp; Place Order</button>
+          </div>
+        </div>
+      </div>`;
+
+    // Delivery / pickup toggle
+    const pickupBtn = document.getElementById('pickupBtn');
+    const deliveryBtn = document.getElementById('deliveryBtn');
+    const addressField = document.getElementById('addressField');
+    const deliveryRow = document.getElementById('deliveryRow');
+    const grandTotal = document.getElementById('grandTotal');
+    let orderType = 'pickup';
+    const DELIVERY_FEE = 200;
+
+    function updateTotal(){
+      const total = subtotal + (orderType === 'delivery' ? DELIVERY_FEE : 0);
+      grandTotal.textContent = 'Rs ' + total.toLocaleString();
+    }
+    pickupBtn.addEventListener('click', () => {
+      orderType = 'pickup';
+      pickupBtn.classList.add('active'); deliveryBtn.classList.remove('active');
+      addressField.classList.remove('show'); deliveryRow.style.display = 'none';
+      updateTotal();
+    });
+    deliveryBtn.addEventListener('click', () => {
+      orderType = 'delivery';
+      deliveryBtn.classList.add('active'); pickupBtn.classList.remove('active');
+      addressField.classList.add('show'); deliveryRow.style.display = 'flex';
+      updateTotal();
+    });
+
+    // Payment method toggle
+    const cashOption = document.getElementById('cashOption');
+    const cardOption = document.getElementById('cardOption');
+    const cardFields = document.getElementById('cardFields');
+    cashOption.addEventListener('click', () => {
+      cashOption.classList.add('active'); cardOption.classList.remove('active');
+      cardFields.classList.remove('show');
+      cashOption.querySelector('input').checked = true;
+    });
+    cardOption.addEventListener('click', () => {
+      cardOption.classList.add('active'); cashOption.classList.remove('active');
+      cardFields.classList.add('show');
+      cardOption.querySelector('input').checked = true;
+    });
+
+    // Place order
+    document.getElementById('placeOrderBtn').addEventListener('click', () => {
+      const errorEl = document.getElementById('checkoutError');
+      const method = document.querySelector('input[name="pay"]:checked').value;
+
+      if(orderType === 'delivery' && !document.getElementById('address').value.trim()){
+        errorEl.textContent = 'Please enter a delivery address.';
+        errorEl.classList.add('show');
+        return;
+      }
+      if(method === 'card'){
+        const num = document.getElementById('cardNumber').value.trim();
+        const exp = document.getElementById('cardExpiry').value.trim();
+        const cvc = document.getElementById('cardCvc').value.trim();
+        if(!num || !exp || !cvc){
+          errorEl.textContent = 'Please fill in your card details.';
+          errorEl.classList.add('show');
+          return;
+        }
+      }
+      errorEl.classList.remove('show');
+
+      const total = subtotal + (orderType === 'delivery' ? DELIVERY_FEE : 0);
+      const order = {
+        id: String(Date.now()).slice(-6),
+        date: new Date().toLocaleString(),
+        items: cart,
+        type: orderType,
+        address: orderType === 'delivery' ? document.getElementById('address').value.trim() : null,
+        method,
+        total,
+        status: 'new',
+        refund: 'none'
+      };
+
+      const orders = getOrders();
+      orders.unshift(order);
+      saveOrders(orders);
+      localStorage.removeItem('bnb-cart');
+      addNotification(`Order #${order.id} has been confirmed and is being prepared.`);
+
+      window.location.href = 'order-tracking.html?order=' + order.id;
+    });
+
+    updateTotal();
+  }
+</script>
+
+</body>
+</html>

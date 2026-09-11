@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Order — Bean &amp; Brew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --green:#3E7A4C; --shadow:0 20px 50px -20px rgba(36,18,9,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Manrope', sans-serif; background:var(--cream); color:var(--ink); line-height:1.5; }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:700; }
+  .wrap{ max-width:820px; margin:0 auto; padding:0 28px; }
+
+  header{ background:rgba(246,236,223,.95); border-bottom:1px solid rgba(74,40,24,.1); padding:18px 0; }
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{ width:40px; height:40px; border-radius:50%; background:var(--red-600); display:flex; align-items:center; justify-content:center; color:var(--cream); font-family:'Fraunces',serif; font-weight:700; font-size:16px; }
+  .logo-text{ font-family:'Fraunces', serif; font-weight:700; font-size:19px; color:var(--brown-950); }
+  .back-link{ font-size:13.5px; font-weight:700; color:var(--brown-800); display:flex; align-items:center; gap:6px; }
+  .back-link svg{ width:15px; height:15px; }
+
+  main{ padding:40px 0 90px; }
+
+  .order-picker{ display:flex; gap:10px; margin-bottom:28px; overflow-x:auto; padding-bottom:4px; }
+  .order-chip{ flex-shrink:0; padding:9px 16px; border-radius:100px; border:1.5px solid rgba(74,40,24,.15); background:#fff; font-size:12.5px; font-weight:700; color:var(--brown-800); cursor:pointer; white-space:nowrap; }
+  .order-chip.active{ border-color:var(--red-600); background:var(--red-600); color:var(--cream); }
+
+  .panel{ background:#fff; border-radius:20px; padding:30px; box-shadow:0 10px 30px -20px rgba(36,18,9,.3); margin-bottom:22px; }
+  .order-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:26px; flex-wrap:wrap; gap:10px; }
+  .order-top h2{ font-size:20px; color:var(--brown-950); }
+  .order-top p{ font-size:12.5px; color:var(--brown-800); opacity:.65; margin-top:4px; }
+  .pill{ font-size:11.5px; font-weight:800; padding:6px 14px; border-radius:100px; text-transform:capitalize; }
+  .pill.new{ background:rgba(168,51,36,.1); color:var(--red-600); }
+  .pill.prep{ background:rgba(199,154,92,.2); color:#9C7530; }
+  .pill.ready{ background:rgba(62,122,76,.12); color:var(--green); }
+  .pill.completed{ background:rgba(74,40,24,.1); color:var(--brown-800); }
+  .pill.cancelled{ background:rgba(168,51,36,.1); color:var(--red-700); }
+
+  /* Timeline */
+  .timeline{ display:flex; align-items:flex-start; margin-bottom:30px; }
+  .tl-step{ flex:1; text-align:center; position:relative; }
+  .tl-dot{ width:34px; height:34px; border-radius:50%; background:rgba(74,40,24,.12); color:var(--brown-800); display:flex; align-items:center; justify-content:center; margin:0 auto 10px; font-weight:800; font-size:13px; position:relative; z-index:2; }
+  .tl-dot.done{ background:var(--red-600); color:var(--cream); }
+  .tl-line{ position:absolute; top:17px; left:-50%; width:100%; height:3px; background:rgba(74,40,24,.12); z-index:1; }
+  .tl-line.done{ background:var(--red-600); }
+  .tl-step:first-child .tl-line{ display:none; }
+  .tl-label{ font-size:11.5px; font-weight:700; color:var(--brown-800); opacity:.7; }
+  .tl-step.active .tl-label{ opacity:1; color:var(--brown-950); }
+
+  .cancelled-note{ background:#FBE3DE; color:var(--red-700); padding:14px 18px; border-radius:12px; font-size:13.5px; font-weight:600; margin-bottom:26px; }
+
+  .order-items{ margin-bottom:22px; }
+  .order-line{ display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(74,40,24,.08); font-size:14px; }
+  .order-line:last-child{ border-bottom:none; }
+  .order-line .name{ font-weight:700; color:var(--brown-950); }
+  .order-line .qty{ color:var(--brown-800); opacity:.65; font-size:12.5px; }
+  .order-line .price{ font-family:'Fraunces',serif; font-weight:700; color:var(--red-600); }
+
+  .meta-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; padding-top:18px; border-top:1px solid rgba(74,40,24,.1); }
+  .meta-grid div span{ display:block; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--brown-800); opacity:.55; margin-bottom:5px; }
+  .meta-grid div strong{ font-size:14px; color:var(--brown-950); }
+
+  .btn-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:13px 24px; border-radius:100px; font-weight:700; font-size:13.5px; cursor:pointer; border:1.5px solid transparent; transition:transform .2s ease; }
+  .btn-primary{ background:var(--red-600); color:var(--cream); }
+  .btn-outline{ background:transparent; border-color:var(--brown-800); color:var(--brown-900); }
+  .btn-danger{ background:transparent; border-color:var(--red-600); color:var(--red-600); }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
+
+  .empty-state{ text-align:center; padding:60px 20px; background:#fff; border-radius:18px; }
+  .empty-state p{ color:var(--brown-800); opacity:.7; margin-bottom:20px; }
+  .empty-state a{ display:inline-block; padding:12px 26px; background:var(--red-600); color:var(--cream); border-radius:100px; font-weight:700; font-size:14px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="menu.html" class="logo">
+      <div class="logo-mark">B&amp;B</div>
+      <div class="logo-text">Bean &amp; Brew</div>
+    </a>
+    <a href="profile.html" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> Back to Profile</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <h1 style="font-size:26px; color:var(--brown-950); margin-bottom:22px;">Track Your Order</h1>
+    <div class="order-picker" id="orderPicker"></div>
+    <div id="orderDetail"></div>
+  </div>
+</main>
+
+<script>
+  const user = localStorage.getItem('bnb-user');
+  if(!user){
+    sessionStorage.setItem('bnb-redirect', 'order-tracking.html');
+    window.location.href = 'login.html';
+  }
+
+  const ORDERS_KEY = 'bnb-orders-' + user;
+  function getOrders(){
+    try{ return JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveOrders(orders){ localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); }
+  function addNotification(text){
+    const key = 'bnb-notifications-' + user;
+    let list = [];
+    try{ list = JSON.parse(localStorage.getItem(key)) || []; }catch(e){ list = []; }
+    list.unshift({ id: Date.now(), text, date: new Date().toLocaleString(), read:false });
+    localStorage.setItem(key, JSON.stringify(list));
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  let selectedId = urlParams.get('order');
+
+  const STAGES = ['new','prep','ready','completed'];
+  const STAGE_LABELS = { new:'Order Placed', prep:'Preparing', ready:'Ready', completed:'Completed' };
+
+  function renderPicker(orders){
+    const picker = document.getElementById('orderPicker');
+    if(!orders.length){ picker.innerHTML = ''; return; }
+    if(!selectedId || !orders.find(o => o.id === selectedId)){
+      selectedId = orders[0].id;
+    }
+    picker.innerHTML = orders.map(o => `
+      <button class="order-chip ${o.id === selectedId ? 'active' : ''}" data-id="${o.id}">
+        #${o.id}
+      </button>`).join('');
+    picker.querySelectorAll('.order-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        selectedId = chip.dataset.id;
+        render();
+      });
+    });
+  }
+
+  function renderTimeline(order){
+    if(order.status === 'cancelled'){
+      return `<div class="cancelled-note">This order was cancelled. Refund status: <strong>${order.refund === 'processed' ? 'Refund processed' : 'Refund requested — processed within 3–5 business days'}</strong></div>`;
+    }
+    const currentIndex = STAGES.indexOf(order.status);
+    return `<div class="timeline">
+      ${STAGES.map((s, i) => `
+        <div class="tl-step ${i <= currentIndex ? 'active' : ''}">
+          <div class="tl-line ${i <= currentIndex ? 'done' : ''}"></div>
+          <div class="tl-dot ${i <= currentIndex ? 'done' : ''}">${i+1}</div>
+          <div class="tl-label">${STAGE_LABELS[s]}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  function render(){
+    const orders = getOrders();
+    renderPicker(orders);
+    const detail = document.getElementById('orderDetail');
+
+    if(!orders.length){
+      detail.innerHTML = `
+        <div class="empty-state">
+          <h3 style="margin-bottom:10px;">No orders to track</h3>
+          <p>Once you place an order it will show up here.</p>
+          <a href="menu.html">Browse the Menu</a>
+        </div>`;
+      return;
+    }
+
+    const order = orders.find(o => o.id === selectedId) || orders[0];
+    const canCancel = order.status === 'new';
+    const canFeedback = order.status === 'completed';
+
+    detail.innerHTML = `
+      <div class="panel">
+        <div class="order-top">
+          <div>
+            <h2>Order #${order.id}</h2>
+            <p>${order.date} · ${order.type === 'delivery' ? 'Delivery' : 'Pickup'}</p>
+          </div>
+          <span class="pill ${order.status}">${order.status}</span>
+        </div>
+
+        ${renderTimeline(order)}
+
+        <div class="order-items">
+          ${order.items.map(i => `
+            <div class="order-line">
+              <div><span class="name">${i.name}</span> <span class="qty">× ${i.qty}</span></div>
+              <div class="price">Rs ${(i.price * i.qty).toLocaleString()}</div>
+            </div>`).join('')}
+        </div>
+
+        <div class="meta-grid">
+          <div><span>Payment</span><strong>${order.method === 'card' ? 'Card' : 'Cash'}</strong></div>
+          <div><span>Total</span><strong>Rs ${order.total.toLocaleString()}</strong></div>
+          <div><span>${order.type === 'delivery' ? 'Address' : 'Pickup at'}</span><strong>${order.type === 'delivery' ? (order.address || '—') : '123 Galle Road'}</strong></div>
+        </div>
+
+        <div class="btn-row">
+          <a href="invoice.html?order=${order.id}" class="btn btn-outline">View Invoice</a>
+          ${canFeedback ? `<a href="feedback.html?order=${order.id}" class="btn btn-outline">Leave Feedback</a>` : ''}
+          <button class="btn btn-danger" id="cancelBtn" ${canCancel ? '' : 'disabled'}>Cancel &amp; Request Refund</button>
+        </div>
+      </div>`;
+
+    const cancelBtn = document.getElementById('cancelBtn');
+    if(canCancel){
+      cancelBtn.addEventListener('click', () => {
+        if(!confirm('Cancel this order and request a refund?')) return;
+        const allOrders = getOrders();
+        const target = allOrders.find(o => o.id === order.id);
+        target.status = 'cancelled';
+        target.refund = 'requested';
+        saveOrders(allOrders);
+        addNotification(`Order #${order.id} was cancelled. Your refund has been requested.`);
+        render();
+      });
+    }
+  }
+
+  render();
+
+  // Demo helper: gently progress a "new" order to "prep" after a short
+  // delay so the tracking page feels alive without needing staff tools yet.
+  setTimeout(() => {
+    const orders = getOrders();
+    let changed = false;
+    orders.forEach(o => {
+      if(o.status === 'new'){ o.status = 'prep'; changed = true; }
+    });
+    if(changed){ saveOrders(orders); render(); }
+  }, 8000);
+</script>
+
+</body>
+</html>

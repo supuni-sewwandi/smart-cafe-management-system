@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reserve a Table — Bean &amp; Brew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --green:#3E7A4C; --shadow:0 20px 50px -20px rgba(36,18,9,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Manrope', sans-serif; background:var(--cream); color:var(--ink); line-height:1.5; }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:700; }
+  .wrap{ max-width:980px; margin:0 auto; padding:0 28px; }
+
+  header{ background:rgba(246,236,223,.95); border-bottom:1px solid rgba(74,40,24,.1); padding:18px 0; }
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{ width:40px; height:40px; border-radius:50%; background:var(--red-600); display:flex; align-items:center; justify-content:center; color:var(--cream); font-family:'Fraunces',serif; font-weight:700; font-size:16px; }
+  .logo-text{ font-family:'Fraunces', serif; font-weight:700; font-size:19px; color:var(--brown-950); }
+  .back-link{ font-size:13.5px; font-weight:700; color:var(--brown-800); display:flex; align-items:center; gap:6px; }
+  .back-link svg{ width:15px; height:15px; }
+
+  main{ padding:40px 0 90px; }
+  .page-head{ margin-bottom:30px; }
+  .page-head span{ font-size:12.5px; font-weight:800; letter-spacing:.1em; color:var(--red-600); text-transform:uppercase; }
+  .page-head h1{ font-size:28px; color:var(--brown-950); margin-top:8px; }
+
+  .res-grid{ display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start; }
+
+  .panel{ background:#fff; border-radius:18px; padding:28px; box-shadow:0 10px 26px -20px rgba(36,18,9,.3); margin-bottom:22px; }
+  .panel h2{ font-size:16.5px; color:var(--brown-950); margin-bottom:18px; }
+
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--brown-900); margin-bottom:7px; }
+  .field input, .field select{ width:100%; padding:12px 14px; border-radius:10px; border:1.5px solid rgba(74,40,24,.18); font-size:14px; font-family:inherit; outline:none; background:#fff; }
+  .field input:focus, .field select:focus{ border-color:var(--red-600); }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; padding:13px 24px; border-radius:100px; font-weight:700; font-size:13.5px; cursor:pointer; border:1.5px solid transparent; width:100%; transition:transform .2s; }
+  .btn-primary{ background:var(--red-600); color:var(--cream); box-shadow:0 12px 24px -10px rgba(168,51,36,.55); }
+  .btn-outline{ background:transparent; border-color:var(--brown-800); color:var(--brown-900); width:auto; padding:9px 16px; font-size:12.5px; }
+  .btn:hover{ transform:translateY(-2px); }
+
+  .slot-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px; }
+  .slot{ padding:11px 6px; border-radius:10px; border:1.5px solid rgba(74,40,24,.15); text-align:center; font-size:12.5px; font-weight:700; color:var(--brown-800); cursor:pointer; transition:all .2s; }
+  .slot.selected{ border-color:var(--red-600); background:rgba(168,51,36,.08); color:var(--red-700); }
+  .slot.full{ opacity:.4; cursor:not-allowed; text-decoration:line-through; }
+  .hint{ font-size:12px; color:var(--brown-800); opacity:.6; margin-bottom:16px; }
+
+  .error-msg{ display:none; background:#FBE3DE; color:var(--red-700); font-size:13px; font-weight:600; padding:10px 14px; border-radius:10px; margin-bottom:16px; }
+  .error-msg.show{ display:block; }
+  .success-msg{ display:none; background:rgba(62,122,76,.12); color:var(--green); font-size:13px; font-weight:600; padding:10px 14px; border-radius:10px; margin-bottom:16px; }
+  .success-msg.show{ display:block; }
+
+  .res-card{ background:#fff; border-radius:14px; padding:18px 20px; margin-bottom:12px; box-shadow:0 8px 22px -18px rgba(36,18,9,.3); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+  .res-card .info strong{ display:block; font-size:14.5px; color:var(--brown-950); }
+  .res-card .info span{ font-size:12.5px; color:var(--brown-800); opacity:.7; }
+  .pill{ font-size:11px; font-weight:800; padding:5px 12px; border-radius:100px; background:rgba(62,122,76,.12); color:var(--green); }
+  .pill.cancelled{ background:rgba(168,51,36,.1); color:var(--red-700); }
+  .empty-note{ font-size:13.5px; color:var(--brown-800); opacity:.6; text-align:center; padding:26px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="menu.html" class="logo">
+      <div class="logo-mark">B&amp;B</div>
+      <div class="logo-text">Bean &amp; Brew</div>
+    </a>
+    <a href="profile.html" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> Back to Profile</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <span>Book Ahead</span>
+      <h1>Reserve a Table</h1>
+    </div>
+
+    <div class="res-grid">
+      <div class="panel">
+        <h2>New Reservation</h2>
+        <div class="error-msg" id="resError"></div>
+        <div class="success-msg" id="resSuccess">Table reserved! We'll see you soon.</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="resDate">Date</label>
+            <input type="date" id="resDate">
+          </div>
+          <div class="field">
+            <label for="resGuests">Guests</label>
+            <select id="resGuests">
+              <option value="1">1 guest</option>
+              <option value="2" selected>2 guests</option>
+              <option value="3">3 guests</option>
+              <option value="4">4 guests</option>
+              <option value="5">5–6 guests</option>
+              <option value="7">7+ guests</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Available Time Slots</label>
+          <div class="hint">Tap a slot to check &amp; select availability for the chosen date.</div>
+          <div class="slot-grid" id="slotGrid"></div>
+        </div>
+
+        <div class="field">
+          <label for="resName">Name on Reservation</label>
+          <input type="text" id="resName" placeholder="Your name">
+        </div>
+        <div class="field">
+          <label for="resPhone">Contact Number</label>
+          <input type="text" id="resPhone" placeholder="07X XXX XXXX">
+        </div>
+
+        <button class="btn btn-primary" id="reserveBtn">Confirm Reservation</button>
+      </div>
+
+      <div class="panel">
+        <h2>Your Reservations</h2>
+        <div id="resList"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const user = localStorage.getItem('bnb-user');
+  if(!user){
+    sessionStorage.setItem('bnb-redirect', 'reservation.html');
+    window.location.href = 'login.html';
+  }
+
+  const RES_KEY = 'bnb-reservations-' + user;
+  function getReservations(){
+    try{ return JSON.parse(localStorage.getItem(RES_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveReservations(list){ localStorage.setItem(RES_KEY, JSON.stringify(list)); }
+  function addNotification(text){
+    const key = 'bnb-notifications-' + user;
+    let list = [];
+    try{ list = JSON.parse(localStorage.getItem(key)) || []; }catch(e){ list = []; }
+    list.unshift({ id: Date.now(), text, date: new Date().toLocaleString(), read:false });
+    localStorage.setItem(key, JSON.stringify(list));
+  }
+
+  const SLOTS = ['9:00 AM','11:00 AM','1:00 PM','3:00 PM','5:00 PM','7:00 PM'];
+  let selectedSlot = null;
+
+  // Mock availability: deterministically "full" for some slots based on the
+  // chosen date, so re-checking the same date gives consistent results
+  // without needing a backend.
+  function isSlotFull(date, slot){
+    if(!date) return false;
+    const seed = (date + slot).split('').reduce((a,c) => a + c.charCodeAt(0), 0);
+    return seed % 5 === 0;
+  }
+
+  function renderSlots(){
+    const date = document.getElementById('resDate').value;
+    const grid = document.getElementById('slotGrid');
+    grid.innerHTML = SLOTS.map(slot => {
+      const full = isSlotFull(date, slot);
+      const isSelected = slot === selectedSlot;
+      return `<div class="slot ${isSelected ? 'selected' : ''} ${full ? 'full' : ''}" data-slot="${slot}">${slot}</div>`;
+    }).join('');
+    grid.querySelectorAll('.slot:not(.full)').forEach(el => {
+      el.addEventListener('click', () => {
+        selectedSlot = el.dataset.slot;
+        renderSlots();
+      });
+    });
+  }
+  document.getElementById('resDate').addEventListener('change', () => {
+    selectedSlot = null;
+    renderSlots();
+  });
+  renderSlots();
+
+  document.getElementById('reserveBtn').addEventListener('click', () => {
+    const date = document.getElementById('resDate').value;
+    const guests = document.getElementById('resGuests').value;
+    const name = document.getElementById('resName').value.trim();
+    const phone = document.getElementById('resPhone').value.trim();
+    const errorEl = document.getElementById('resError');
+    const successEl = document.getElementById('resSuccess');
+    successEl.classList.remove('show');
+
+    if(!date || !selectedSlot || !name || !phone){
+      errorEl.textContent = 'Please fill in date, time slot, name and phone number.';
+      errorEl.classList.add('show');
+      return;
+    }
+    errorEl.classList.remove('show');
+
+    const reservation = {
+      id: String(Date.now()).slice(-6),
+      date, time: selectedSlot, guests, name, phone,
+      status: 'confirmed'
+    };
+    const list = getReservations();
+    list.unshift(reservation);
+    saveReservations(list);
+    addNotification(`Table reserved for ${date} at ${selectedSlot} (${guests} guests).`);
+
+    successEl.classList.add('show');
+    selectedSlot = null;
+    document.getElementById('resName').value = '';
+    document.getElementById('resPhone').value = '';
+    renderSlots();
+    renderList();
+  });
+
+  function renderList(){
+    const list = getReservations();
+    const el = document.getElementById('resList');
+    if(!list.length){
+      el.innerHTML = '<p class="empty-note">No reservations yet.</p>';
+      return;
+    }
+    el.innerHTML = list.map(r => `
+      <div class="res-card">
+        <div class="info">
+          <strong>${r.date} · ${r.time}</strong>
+          <span>${r.guests} guests · ${r.name}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="pill ${r.status === 'cancelled' ? 'cancelled' : ''}">${r.status}</span>
+          ${r.status !== 'cancelled' ? `<button class="btn btn-outline" data-id="${r.id}">Cancel</button>` : ''}
+        </div>
+      </div>`).join('');
+    el.querySelectorAll('button[data-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const all = getReservations();
+        const target = all.find(r => r.id === btn.dataset.id);
+        target.status = 'cancelled';
+        saveReservations(all);
+        renderList();
+      });
+    });
+  }
+  renderList();
+</script>
+
+</body>
+</html>

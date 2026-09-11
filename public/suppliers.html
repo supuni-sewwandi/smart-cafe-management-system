@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suppliers — Bean &amp; Brew Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#241209; --brown-900:#341A0D; --brown-800:#4A2818;
+    --red-700:#8C2A1E; --red-600:#A83324;
+    --cream:#F6ECDF; --cream-2:#EFE0CB; --gold:#C79A5C; --ink:#2A1A10;
+    --green:#3E7A4C; --shadow:0 20px 50px -20px rgba(36,18,9,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Manrope', sans-serif; background:var(--cream-2); color:var(--ink); line-height:1.5; }
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:700; }
+  button{ font-family:inherit; }
+  .layout{ display:grid; grid-template-columns:250px 1fr; min-height:100vh; }
+  .sidebar{ background:var(--brown-950); color:var(--cream-2); padding:26px 20px; display:flex; flex-direction:column; }
+  .sidebar .logo{ display:flex; align-items:center; gap:10px; padding:6px 8px 26px; border-bottom:1px solid rgba(246,236,223,.12); margin-bottom:22px; }
+  .logo-mark{ width:38px; height:38px; border-radius:50%; background:var(--gold); color:var(--brown-950); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:15px; flex-shrink:0; }
+  .logo-text{ font-family:'Fraunces',serif; font-weight:700; font-size:17px; color:var(--cream); line-height:1.15; }
+  .logo-text small{ display:block; font-family:'Manrope',sans-serif; font-weight:700; font-size:9.5px; letter-spacing:.18em; color:var(--gold); margin-top:3px; }
+  .nav-group{ margin-bottom:22px; }
+  .nav-group h4{ font-size:10.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--cream-2); opacity:.4; font-weight:700; padding:0 10px; margin-bottom:10px; }
+  .nav-item{ display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:10px; font-size:14px; font-weight:600; color:var(--cream-2); opacity:.8; cursor:pointer; transition:background .2s, opacity .2s; border:none; background:none; width:100%; text-align:left; }
+  .nav-item svg{ width:17px; height:17px; flex-shrink:0; }
+  .nav-item:hover{ background:rgba(246,236,223,.08); opacity:1; }
+  .nav-item.active{ background:var(--red-600); opacity:1; color:var(--cream); }
+  .sidebar-foot{ margin-top:auto; padding-top:18px; border-top:1px solid rgba(246,236,223,.12); }
+  .admin-chip{ display:flex; align-items:center; gap:10px; padding:8px 10px; margin-bottom:10px; }
+  .admin-avatar{ width:32px; height:32px; border-radius:50%; background:var(--gold); color:var(--brown-950); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0; }
+  .admin-chip div p{ font-size:12.5px; font-weight:700; color:var(--cream); }
+  .admin-chip div span{ font-size:10.5px; color:var(--gold); font-weight:700; letter-spacing:.04em; }
+  .logout-link{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; font-size:13.5px; font-weight:700; color:var(--cream-2); opacity:.75; cursor:pointer; border:none; background:none; width:100%; text-align:left; }
+  .logout-link:hover{ opacity:1; color:var(--gold); }
+  .logout-link svg{ width:16px; height:16px; }
+
+  main{ padding:34px 40px 60px; overflow-x:hidden; }
+  .topline{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:14px; }
+  .topline h1{ font-size:26px; color:var(--brown-950); margin-bottom:5px; }
+  .topline p{ font-size:13.5px; color:var(--brown-800); opacity:.75; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 20px; border-radius:100px; font-weight:700; font-size:13px; cursor:pointer; border:1.5px solid transparent; }
+  .btn-primary{ background:var(--red-600); color:var(--cream); }
+  .btn-outline{ background:transparent; border:1.5px solid var(--brown-800); color:var(--brown-900); }
+  .btn-green{ background:var(--green); color:var(--cream); }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .tabs{ display:flex; gap:0; margin-bottom:24px; border-bottom:1px solid rgba(74,40,24,.12); }
+  .tab{ padding:11px 6px; margin-right:24px; font-size:13.5px; font-weight:700; color:var(--brown-800); opacity:.55; background:none; border:none; cursor:pointer; border-bottom:2px solid transparent; }
+  .tab.active{ opacity:1; color:var(--red-600); border-color:var(--red-600); }
+
+  .panel{ background:#fff; border-radius:18px; padding:24px; box-shadow:0 10px 26px -20px rgba(36,18,9,.3); }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--brown-800); opacity:.55; font-weight:800; padding-bottom:12px; border-bottom:1px solid rgba(74,40,24,.1); }
+  tbody td{ padding:13px 6px 13px 0; border-bottom:1px solid rgba(74,40,24,.07); font-size:13.5px; color:var(--brown-950); vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+
+  .pill{ font-size:11px; font-weight:800; padding:5px 11px; border-radius:100px; display:inline-block; white-space:nowrap; text-transform:capitalize; }
+  .pill.requested{ background:rgba(168,51,36,.1); color:var(--red-600); }
+  .pill.confirmed{ background:rgba(199,154,92,.2); color:#9C7530; }
+  .pill.shipped{ background:rgba(62,122,76,.12); color:var(--green); }
+  .pill.delivered{ background:rgba(74,40,24,.1); color:var(--brown-800); }
+
+  .icon-btn{ width:30px; height:30px; border-radius:8px; border:1px solid rgba(74,40,24,.15); background:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; margin-right:4px; }
+  .icon-btn svg{ width:14px; height:14px; }
+  .icon-btn:hover{ background:var(--cream-2); }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(36,18,9,.5); display:none; align-items:center; justify-content:center; z-index:100; }
+  .modal-overlay.open{ display:flex; }
+  .modal{ background:#fff; border-radius:18px; padding:28px; width:100%; max-width:420px; box-shadow:var(--shadow); }
+  .modal h3{ font-size:18px; color:var(--brown-950); margin-bottom:18px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12px; font-weight:700; color:var(--brown-900); margin-bottom:6px; }
+  .field input, .field select{ width:100%; padding:10px 12px; border-radius:9px; border:1.5px solid rgba(74,40,24,.18); font-size:13.5px; font-family:inherit; outline:none; }
+  .modal-actions{ display:flex; gap:10px; margin-top:20px; }
+  .modal-actions .btn{ flex:1; }
+  .empty-note{ text-align:center; font-size:13px; color:var(--brown-800); opacity:.6; padding:30px 0; }
+
+  @media(max-width:1100px){ .layout{ grid-template-columns:210px 1fr; } }
+  @media(max-width:720px){ .layout{ grid-template-columns:1fr; } .sidebar{ display:none; } main{ padding:24px 20px 50px; } }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">B&amp;B</div>
+      <div class="logo-text">Bean &amp; Brew<small>ADMIN PANEL</small></div>
+    </div>
+    <div class="nav-group">
+      <h4>Overview</h4>
+      <a class="nav-item" href="admin-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+    </div>
+    <div class="nav-group">
+      <h4>Operations</h4>
+      <a class="nav-item" href="staff-orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h13a3 3 0 0 1 0 6h-1M4 8v8a4 4 0 0 0 4 4h5a4 4 0 0 0 4-4v-1M4 8l1-4h9l1 4"/></svg>
+        Orders
+      </a>
+      <a class="nav-item" href="inventory.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Inventory
+      </a>
+      <a class="nav-item active" href="suppliers.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+        Suppliers
+      </a>
+      <a class="nav-item" href="staff.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="18" cy="8" r="2.6"/><path d="M15.5 14.2c2.6.4 4.5 2.7 4.5 5.6"/></svg>
+        Staff &amp; Team
+      </a>
+    </div>
+    <div class="nav-group">
+      <h4>System</h4>
+      <a class="nav-item" href="system-admin.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>
+        System Admin
+      </a>
+    </div>
+    <div class="nav-group">
+      <h4>Insights</h4>
+      <a class="nav-item" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M11 19V4M18 19v-6"/></svg>
+        Reports
+      </a>
+    </div>
+    <div class="sidebar-foot">
+      <div class="admin-chip">
+        <div class="admin-avatar" id="adminAvatar">A</div>
+        <div><p id="adminEmailLabel">admin</p><span>ADMINISTRATOR</span></div>
+      </div>
+      <button class="logout-link" id="adminLogoutBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Log Out
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topline">
+      <div>
+        <h1>Suppliers</h1>
+        <p>Manage supplier records and track purchase requests through to delivery.</p>
+      </div>
+      <button class="btn btn-primary" id="addSupplierBtn">+ Add Supplier</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="suppliers">Our Suppliers</button>
+      <button class="tab" data-tab="requests">Purchase Requests</button>
+    </div>
+
+    <div class="panel" id="tabContent"></div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="supplierModalOverlay">
+  <div class="modal">
+    <h3 id="supplierModalTitle">Add Supplier</h3>
+    <input type="hidden" id="supplierEditId">
+    <div class="field"><label>Supplier Name</label><input type="text" id="supplierName" placeholder="e.g. Ceylon Coffee Traders"></div>
+    <div class="field"><label>Contact Person</label><input type="text" id="supplierContact" placeholder="e.g. Mr. Perera"></div>
+    <div class="field"><label>Phone</label><input type="text" id="supplierPhone" placeholder="07X XXX XXXX"></div>
+    <div class="field"><label>Items Supplied</label><input type="text" id="supplierItems" placeholder="e.g. Coffee beans, cold brew concentrate"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="supplierModalCancel">Cancel</button>
+      <button class="btn btn-primary" id="supplierModalSave">Save Supplier</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const adminEmail = sessionStorage.getItem('bnb-admin');
+  if(!adminEmail){ window.location.href = 'admin-login.html'; }
+  document.getElementById('adminEmailLabel').textContent = adminEmail;
+  document.getElementById('adminAvatar').textContent = adminEmail.charAt(0).toUpperCase();
+  document.getElementById('adminLogoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('bnb-admin');
+    window.location.href = 'admin-login.html';
+  });
+
+  const SUPPLIER_KEY = 'bnb-suppliers';
+  const REQUEST_KEY = 'bnb-purchase-requests';
+
+  function getSuppliers(){
+    try{
+      const data = JSON.parse(localStorage.getItem(SUPPLIER_KEY));
+      if(data && data.length) return data;
+    }catch(e){}
+    const seed = [
+      { id:'1', name:'Ceylon Coffee Traders', contact:'Mr. Perera', phone:'077 111 2233', items:'Coffee beans, cold brew concentrate' },
+      { id:'2', name:'Fresh Dairy Co.', contact:'Ms. Fernando', phone:'071 222 3344', items:'Milk, oat milk, cream' },
+      { id:'3', name:'Golden Bakes Supply', contact:'Mr. Silva', phone:'076 333 4455', items:'Croissant dough, pastries' },
+    ];
+    localStorage.setItem(SUPPLIER_KEY, JSON.stringify(seed));
+    return seed;
+  }
+  function saveSuppliers(list){ localStorage.setItem(SUPPLIER_KEY, JSON.stringify(list)); }
+
+  function getInventory(){
+    try{ return JSON.parse(localStorage.getItem('bnb-inventory')) || []; }catch(e){ return []; }
+  }
+
+  // Purchase requests are generated for low-stock items (as an Inventory
+  // Manager would raise them) and flow through a simple status pipeline
+  // that a Supplier updates: requested -> confirmed -> shipped -> delivered.
+  function getRequests(){
+    try{ return JSON.parse(localStorage.getItem(REQUEST_KEY)) || []; }catch(e){ return []; }
+  }
+  function saveRequests(list){ localStorage.setItem(REQUEST_KEY, JSON.stringify(list)); }
+
+  function syncRequestsFromLowStock(){
+    const inv = getInventory();
+    const requests = getRequests();
+    const low = inv.filter(i => i.stock <= i.reorder);
+    low.forEach(item => {
+      const exists = requests.find(r => r.itemName === item.name && ['requested','confirmed','shipped'].includes(r.status));
+      if(!exists){
+        requests.unshift({
+          id: String(Date.now()) + item.id, itemName: item.name,
+          qty: (item.reorder * 2) - item.stock, supplier: item.supplier || '—',
+          status: 'requested', date: new Date().toLocaleDateString()
+        });
+      }
+    });
+    saveRequests(requests);
+  }
+
+  let currentTab = 'suppliers';
+  const STAGE_ORDER = ['requested','confirmed','shipped','delivered'];
+  const NEXT_LABEL = { requested:'Confirm', confirmed:'Mark Shipped', shipped:'Mark Delivered' };
+
+  function renderSuppliersTab(){
+    const suppliers = getSuppliers();
+    return `
+      <table>
+        <thead><tr><th>Supplier</th><th>Contact</th><th>Phone</th><th>Items Supplied</th><th></th></tr></thead>
+        <tbody>
+          ${suppliers.map(s => `
+            <tr>
+              <td><strong>${s.name}</strong></td>
+              <td>${s.contact}</td>
+              <td>${s.phone}</td>
+              <td>${s.items}</td>
+              <td>
+                <button class="icon-btn" data-edit="${s.id}" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+                <button class="icon-btn" data-remove="${s.id}" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6h12z"/></svg></button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  function renderRequestsTab(){
+    syncRequestsFromLowStock();
+    const requests = getRequests();
+    if(!requests.length) return `<p class="empty-note">No purchase requests right now — stock levels look healthy.</p>`;
+    return `
+      <table>
+        <thead><tr><th>Item</th><th>Qty Requested</th><th>Supplier</th><th>Status</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+          ${requests.map(r => `
+            <tr>
+              <td><strong>${r.itemName}</strong></td>
+              <td>${r.qty}</td>
+              <td>${r.supplier}</td>
+              <td><span class="pill ${r.status}">${r.status}</span></td>
+              <td>${r.date}</td>
+              <td>
+                ${NEXT_LABEL[r.status] ? `<button class="btn btn-outline" data-advance="${r.id}">${NEXT_LABEL[r.status]}</button>` : '<span style="opacity:.5; font-size:12px;">Complete</span>'}
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  function renderTabContent(){
+    document.getElementById('tabContent').innerHTML =
+      currentTab === 'suppliers' ? renderSuppliersTab() : renderRequestsTab();
+    attachEvents();
+  }
+
+  function attachEvents(){
+    document.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.addEventListener('click', () => openSupplierModal(btn.dataset.edit));
+    });
+    document.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if(!confirm('Remove this supplier?')) return;
+        saveSuppliers(getSuppliers().filter(s => s.id !== btn.dataset.remove));
+        renderTabContent();
+      });
+    });
+    document.querySelectorAll('[data-advance]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const requests = getRequests();
+        const target = requests.find(r => r.id === btn.dataset.advance);
+        const idx = STAGE_ORDER.indexOf(target.status);
+        target.status = STAGE_ORDER[idx + 1];
+        // Delivered requests restock inventory automatically
+        if(target.status === 'delivered'){
+          const inv = getInventory();
+          const item = inv.find(i => i.name === target.itemName);
+          if(item){ item.stock += target.qty; localStorage.setItem('bnb-inventory', JSON.stringify(inv)); }
+        }
+        saveRequests(requests);
+        renderTabContent();
+      });
+    });
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentTab = tab.dataset.tab;
+      renderTabContent();
+    });
+  });
+
+  const supplierModalOverlay = document.getElementById('supplierModalOverlay');
+  function openSupplierModal(editId){
+    document.getElementById('supplierModalTitle').textContent = editId ? 'Edit Supplier' : 'Add Supplier';
+    document.getElementById('supplierEditId').value = editId || '';
+    if(editId){
+      const s = getSuppliers().find(x => x.id === editId);
+      document.getElementById('supplierName').value = s.name;
+      document.getElementById('supplierContact').value = s.contact;
+      document.getElementById('supplierPhone').value = s.phone;
+      document.getElementById('supplierItems').value = s.items;
+    } else {
+      ['supplierName','supplierContact','supplierPhone','supplierItems'].forEach(id => document.getElementById(id).value = '');
+    }
+    supplierModalOverlay.classList.add('open');
+  }
+  document.getElementById('addSupplierBtn').addEventListener('click', () => openSupplierModal(null));
+  document.getElementById('supplierModalCancel').addEventListener('click', () => supplierModalOverlay.classList.remove('open'));
+  document.getElementById('supplierModalSave').addEventListener('click', () => {
+    const name = document.getElementById('supplierName').value.trim();
+    if(!name){ alert('Please enter a supplier name.'); return; }
+    const editId = document.getElementById('supplierEditId').value;
+    const list = getSuppliers();
+    const payload = {
+      name,
+      contact: document.getElementById('supplierContact').value.trim(),
+      phone: document.getElementById('supplierPhone').value.trim(),
+      items: document.getElementById('supplierItems').value.trim()
+    };
+    if(editId){
+      const idx = list.findIndex(s => s.id === editId);
+      list[idx] = { ...list[idx], ...payload };
+    } else {
+      list.push({ id: String(Date.now()), ...payload });
+    }
+    saveSuppliers(list);
+    supplierModalOverlay.classList.remove('open');
+    renderTabContent();
+  });
+
+  renderTabContent();
+</script>
+
+</body>
+</html>
